@@ -69,9 +69,9 @@ To: Jane Doe <+37060000000>, John Smith <+37061111111>
 Message: "See you at 18:00."
 ```
 
-Use `Name Surname <number>` when `find_contact` resolves it; otherwise show the number alone. This
-is informational — do not turn it into a separate yes/no question. The tool's own confirmation is
-the approval gate.
+Use `Name Surname <number>` when `find_contact` resolves it; otherwise show the number alone. For
+a batch, list every recipient and the exact text once before the first send. This is informational
+— do not turn it into a separate yes/no question. The tool's own confirmation is the approval gate.
 
 ## Rules
 
@@ -83,19 +83,21 @@ the approval gate.
    line only when the user asks or when the exact wording matters (an address, a time, a code).
    Never paste a whole thread into a file, a commit, an email or another tool unless the user
    asks for exactly that.
-3. **One send per confirmation.** Do not call `send_sms` twice for the same message. `handed to
-   phone` means the daemon accepted it, not that it was delivered; the sent text appears in
-   `read_thread` once the phone syncs, usually within a minute, sometimes longer. A sent message
-   missing from the thread is not proof of failure. Never resend on that basis; ask the user to
-   look at the phone.
+3. **One send per recipient and confirmation.** Do not call `send_sms` twice for the same
+   recipient and message. `handed to phone` means the daemon accepted it, not that it was
+   delivered; the sent text appears in `read_thread` once the phone syncs, usually within a
+   minute, sometimes longer. A sent message missing from the thread is not proof of failure.
+   Never resend on that basis; ask the user to look at the phone.
 4. **Verification codes stay in the conversation.** When you read an OTP or 2FA code for the
    user, report the code and nothing else from that message, use it only for the step the user
    asked for, and never forward it by text or write it anywhere persistent.
-5. **Multiple recipients are allowed; unsolicited bulk campaigns are not.** A single `send_sms`
-   call may target several numbers as one group message. Include every recipient in the send
-   summary. Do not loop over contacts, schedule sends, or send marketing. If the user asks for a
-   large unsolicited broadcast, explain that this tool sends from their personal number and that
-   bulk texting needs a business number and consent.
+5. **Explicit batch sends are allowed.** A single `send_sms` call may target several numbers as
+   one group message, or you may send the same text to several people one by one when the user
+   asks for that. Show every recipient and the exact text in one send summary before the first
+   send, then call `send_sms` for each recipient. Do not send unsolicited marketing or messages
+   the user did not ask for. If the user asks for a large unsolicited broadcast, explain that
+   this tool sends from their personal number and that bulk texting needs a business number and
+   consent.
 6. **Read before you reply.** Call `read_thread` for the relevant conversation before drafting a
    reply so the draft fits the context, the tone and the language the user normally uses with
    that person.
@@ -114,6 +116,10 @@ handle approval. Confirm with the tool's answer, in one line.
 
 **New message to a name.** `find_contact("name")`. If several people or numbers match, list them
 and ask which one. Then draft, show the send summary, and call `send_sms`.
+
+**Batch send.** When the user explicitly asks to send the same text to several people, resolve
+every recipient, show one send summary with all names and numbers plus the exact text, then call
+`send_sms` once per recipient. The tool confirmation handles approval for each send.
 
 **Verification code.** `list_threads(unread_only=True, limit=10)` first; the code is usually the
 newest unread from a short code or an unknown sender. If not there, `list_threads(limit=10)`

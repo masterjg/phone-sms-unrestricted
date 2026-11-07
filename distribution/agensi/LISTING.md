@@ -25,7 +25,7 @@ The phone-sms MCP server runs on your Linux machine and talks to the KDE Connect
 Works with any MCP client: Claude Code (as a plugin that bundles this skill, or as a plain MCP server), Claude Desktop, Cursor, Codex, Zed, Gemini CLI and others. Needs Linux with a D-Bus session, KDE Connect (`kdeconnectd`, no Plasma needed; fine under GNOME, Hyprland, Sway), the KDE Connect Android app paired with the SMS plugin on, `uv` and Python 3.12+.
 
 **Why this beats prompting it yourself**
-Without the skill the model has four bare tool names and will happily send on a vague "reply to him". The skill adds the rules that matter with a personal number: show recipient and exact text and wait for a yes, one send per approval, never resend because a thread looks stale, quote only what the task needs, keep OTP codes in the conversation, no bulk sends. It also encodes the operational knowledge: thread ids, E.164 numbers, name resolution, sync lag, what "handed to phone" means, and the `kdeconnect-cli -l` preflight that solves most setup problems.
+Without the skill the model has four bare tool names and will happily send on a vague "reply to him". The skill adds the rules that matter with a personal number: show the recipients and exact text, one send per recipient confirmation, never resend because a thread looks stale, quote only what the task needs, keep OTP codes in the conversation, and no unsolicited bulk campaigns. It also encodes the operational knowledge: thread ids, E.164 numbers, name resolution, sync lag, what "handed to phone" means, and the `kdeconnect-cli -l` preflight that solves most setup problems.
 
 ## Known limitations
 - Linux host + Android phone + KDE Connect only. No iPhone, macOS or Windows.
@@ -49,7 +49,7 @@ The skill file (SKILL.md) is MIT. The phone-sms server it drives is GPL-3.0-or-l
 
 ## FAQ
 1. **Does my data go through Agensi or any cloud?** No. The skill is a text file. The server talks only to KDE Connect on your machine; the message travels from your phone over your carrier like any text you type.
-2. **Will it send texts on its own?** No. The tool is marked destructive, the server's instructions and this skill both require the agent to show you the recipient and the exact wording and wait for your yes, and Claude Code adds its own permission prompt.
+2. **Will it send texts on its own?** No. The tool is marked destructive, the skill requires the agent to show you the recipients and exact wording, and the client's tool confirmation is the approval gate.
 3. **Do I need a Twilio account or a second number?** No. It uses your own SIM and number through the KDE Connect app you may already have.
 4. **Can I use it on macOS or Windows, or with an iPhone?** Not yet. It needs a Linux D-Bus session and the KDE Connect Android app. Those are the next things on the roadmap after MMS and OTP helpers.
 5. **How do I set it up?** Pair KDE Connect with your phone and turn on its SMS plugin, check `kdeconnect-cli -l` shows the phone as paired and reachable, then `claude mcp add --scope user phone-sms -- uvx phone-sms` (or the Claude Code plugin: `/plugin marketplace add h-3303/phone-sms`). The skill repeats these steps to the agent if it finds the tools missing.

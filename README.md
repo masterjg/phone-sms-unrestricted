@@ -12,7 +12,7 @@ no cloud relay, no SMS gateway account, no app to install beyond KDE Connect its
 agent ──MCP──▶ phone-sms ──D-Bus──▶ kdeconnectd ──LAN──▶ KDE Connect (Android) ──▶ SMS
 ```
 
-![Scripted demo with example numbers: Claude lists unread texts, reads the dentist's thread, shows the exact reply and recipient, waits for a yes, then sends from the user's own phone](https://phone-sms.vercel.app/demo.gif)
+![Scripted demo with example numbers: Claude lists unread texts, reads the dentist's thread, shows the exact reply and recipient, then sends after tool confirmation](https://phone-sms.vercel.app/demo.gif)
 
 Tools:
 
@@ -23,9 +23,9 @@ Tools:
 | `find_contact` | look up a contact by name or number fragment (from the phone's synced contacts) |
 | `send_sms` | send a text, or a group text to several numbers |
 
-`send_sms` carries MCP's `destructiveHint`, and the server tells the model never to send until you
-have approved the exact recipient and text in the conversation. Message contents never leave your
-machine except as the model's context.
+`send_sms` carries MCP's `destructiveHint`. The server asks the model to show the exact recipient
+and text before calling it; the client's tool confirmation is the approval gate. Message contents
+never leave your machine except as the model's context.
 
 ## Requirements
 
@@ -108,7 +108,7 @@ The same code paths, for checking things by hand:
 ## How sending works
 
 1. `find_contact <name>` gives the number; `send_sms` takes numbers, ideally in E.164 (`+14375551234`).
-2. The model shows you recipient and text and waits for your yes.
+2. The model shows you the recipient and text, then calls the tool; the client's confirmation is the approval gate.
 3. `send_sms` answers *handed to phone…* once `kdeconnectd` has accepted the request. That is not
    delivery: the sent message shows up in `list_threads` / `read_thread` once the phone syncs it,
    usually within a minute.
@@ -121,10 +121,10 @@ The same code paths, for checking things by hand:
 - **What the model sees.** Only what a tool returns for what you asked: thread listings and the
   messages you have it read. Contact names come from the vCards KDE Connect already synced to
   `~/.local/share/kpeoplevcard/`. Nothing is written to disk by the server.
-- **Sending is gated twice.** `send_sms` is annotated `destructiveHint`, the server instructions
-  and the skill both require the model to show you the exact recipient and text and wait for a yes
-  in the conversation, and in Claude Code the tool permission prompt is a second gate. A group text to a few
-  people is supported; bulk sending to lists is deliberately not.
+- **Sending is gated by confirmation.** `send_sms` is annotated `destructiveHint`, and the skill
+  requires the model to show the exact recipients and text before calling it. The client's tool
+  confirmation is the approval gate. A group text to several numbers and explicit batch sends are
+  supported; unsolicited bulk campaigns are not.
 - **Supply chain.** Pure Python, two dependencies (`mcp`, `dbus-next`), published from GitHub
   Actions with PyPI trusted publishing; the plugin pins the exact version. Audit it: 340 lines in
   `src/`.

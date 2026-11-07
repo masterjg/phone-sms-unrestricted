@@ -13,7 +13,7 @@ mcp = MCPServer(
     instructions=(
         "Reads and sends SMS through the user's own phone (KDE Connect, local network only). "
         "Message contents are private: quote only what the task needs. "
-        "Never call send_sms until the user has explicitly approved the exact recipient and text in this conversation."
+        "Before calling send_sms, show the exact recipients and message text; the client's tool confirmation is the approval gate."
     ),
 )
 phone = Phone()
@@ -76,7 +76,8 @@ def find_contact(query: str) -> str:
 async def send_sms(to: list[str], text: str) -> str:
     """Send an SMS (several numbers = group message) from the user's phone and number.
 
-    ONLY call after the user has explicitly approved this exact recipient list and text.
+    Pass the exact recipient numbers and message text. The client asks the user to confirm the
+    tool call before it runs.
     `to` takes phone numbers; resolve names with find_contact first.
     """
     bad = [n for n in to if len(re.sub(r"\D", "", n)) < 3]
