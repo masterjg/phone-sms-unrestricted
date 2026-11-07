@@ -60,18 +60,30 @@ Numbers: pass them as they appear in `list_threads` or `find_contact` output; E.
 (`+14165550100`) is the safest form. Resolve names with `find_contact` first and, if a contact has
 more than one number, ask which one.
 
+## Send summary
+
+Before every `send_sms` call, write a short summary like:
+
+```text
+To: Jane Doe <+37060000000>, John Smith <+37061111111>
+Message: "See you at 18:00."
+```
+
+Use `Name Surname <number>` when `find_contact` resolves it; otherwise show the number alone. This
+is informational — do not turn it into a separate yes/no question. The tool's own confirmation is
+the approval gate.
+
 ## Rules
 
-1. **Never send without explicit approval of the exact message.** Before every `send_sms` call,
-   show the user the recipient(s) as `Name <number>` and the full text, then wait for a clear yes
-   in this conversation. A general instruction such as "reply to him" or "handle my texts" is not
-   approval of specific words. Edits to the draft need a fresh approval. This holds even when the
-   agent is running with permission prompts disabled.
+1. **The tool confirmation is the approval gate.** Show the send summary before every call. Do not
+   ask a separate yes/no question in chat. If the `send_sms` confirmation is unavailable or
+   disabled, ask for explicit approval in chat before sending. If the user changes the text or
+   recipients, show the updated summary before calling again.
 2. **Quote only what the task needs.** Message contents are private. Summarise threads; quote a
    line only when the user asks or when the exact wording matters (an address, a time, a code).
    Never paste a whole thread into a file, a commit, an email or another tool unless the user
    asks for exactly that.
-3. **One send per approval.** Do not call `send_sms` twice for the same message. `handed to
+3. **One send per confirmation.** Do not call `send_sms` twice for the same message. `handed to
    phone` means the daemon accepted it, not that it was delivered; the sent text appears in
    `read_thread` once the phone syncs, usually within a minute, sometimes longer. A sent message
    missing from the thread is not proof of failure. Never resend on that basis; ask the user to
@@ -80,11 +92,10 @@ more than one number, ask which one.
    user, report the code and nothing else from that message, use it only for the step the user
    asked for, and never forward it by text or write it anywhere persistent.
 5. **Multiple recipients are allowed; unsolicited bulk campaigns are not.** A single `send_sms`
-   call may target several numbers as one group message. Show the full recipient list and the
-   exact text, and get explicit approval before sending. Do not loop over contacts, schedule
-   sends, or send marketing. If the user asks for a large unsolicited broadcast, explain that
-   this tool sends from their personal number and that bulk texting needs a business number and
-   consent.
+   call may target several numbers as one group message. Include every recipient in the send
+   summary. Do not loop over contacts, schedule sends, or send marketing. If the user asks for a
+   large unsolicited broadcast, explain that this tool sends from their personal number and that
+   bulk texting needs a business number and consent.
 6. **Read before you reply.** Call `read_thread` for the relevant conversation before drafting a
    reply so the draft fits the context, the tone and the language the user normally uses with
    that person.
@@ -98,11 +109,11 @@ thread: who, when, the gist, whether it needs a reply. Offer to draft replies; d
 `count` (5 to 10). Answer the question; quote only the relevant line.
 
 **Reply to someone.** `read_thread` for context, draft in the user's voice (short, matching how
-they write to that person), show `To: Name <number>` plus the exact text, wait for yes, then
-`send_sms`. Confirm with the tool's answer, in one line.
+they write to that person), show the send summary, then `send_sms` and let the tool confirmation
+handle approval. Confirm with the tool's answer, in one line.
 
 **New message to a name.** `find_contact("name")`. If several people or numbers match, list them
-and ask. Then draft, show, wait, send.
+and ask which one. Then draft, show the send summary, and call `send_sms`.
 
 **Verification code.** `list_threads(unread_only=True, limit=10)` first; the code is usually the
 newest unread from a short code or an unknown sender. If not there, `list_threads(limit=10)`
@@ -110,8 +121,8 @@ without the filter (some phones mark it read when a notification is dismissed). 
 digits, apply rule 4. If the code has not arrived, wait a few seconds and look once or twice more,
 not indefinitely.
 
-**Group text.** `send_sms(to=[n1, n2, n3], text=...)` sends one group message. Show all
-recipients by name and number before asking for approval.
+**Group text.** `send_sms(to=[n1, n2, n3], text=...)` sends one group message. Show every
+recipient as `Name Surname <number>` when known, plus the exact text, then call the tool.
 
 ## Limitations, stated plainly to the user when relevant
 
