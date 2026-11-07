@@ -79,10 +79,12 @@ more than one number, ask which one.
 4. **Verification codes stay in the conversation.** When you read an OTP or 2FA code for the
    user, report the code and nothing else from that message, use it only for the step the user
    asked for, and never forward it by text or write it anywhere persistent.
-5. **No bulk or automated sending.** This is the user's personal number. Do not loop over
-   contacts, do not schedule sends, do not send marketing. If the user asks for a campaign, say
-   this tool is for personal and one-to-one messages and that bulk texting needs a business
-   number and consent.
+5. **Multiple recipients are allowed; unsolicited bulk campaigns are not.** A single `send_sms`
+   call may target several numbers as one group message. Show the full recipient list and the
+   exact text, and get explicit approval before sending. Do not loop over contacts, schedule
+   sends, or send marketing. If the user asks for a large unsolicited broadcast, explain that
+   this tool sends from their personal number and that bulk texting needs a business number and
+   consent.
 6. **Read before you reply.** Call `read_thread` for the relevant conversation before drafting a
    reply so the draft fits the context, the tone and the language the user normally uses with
    that person.
