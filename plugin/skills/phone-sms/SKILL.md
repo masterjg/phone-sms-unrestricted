@@ -1,8 +1,8 @@
 ---
-name: phone-sms
-description: Read, triage and send SMS through the user's own Android phone using the phone-sms MCP server (KDE Connect over the local network, no cloud relay). Use when the user mentions texts, SMS, text messages, a verification or OTP code that arrived by text, "did X text me", "text Y back", or wants a digest of unread messages. Linux + Android + KDE Connect only.
+name: KDE Connect SMS
+description: Read, triage and send SMS through the user's own Android phone using the kde-connect-sms MCP server (package `phone-sms`, KDE Connect over the local network, no cloud relay). Use when the user mentions texts, SMS, text messages, a verification or OTP code that arrived by text, "did X text me", "text Y back", or wants a digest of unread messages. Linux + Android + KDE Connect only.
 license: MIT
-compatibility: Needs the phone-sms MCP server (`uvx phone-sms`) connected to the agent, Linux with KDE Connect paired to an Android phone.
+compatibility: Needs the kde-connect-sms MCP server (`uvx phone-sms`) connected to the agent, Linux with KDE Connect paired to an Android phone.
 external_urls:
   - https://pypi.org
   - https://files.pythonhosted.org
@@ -14,11 +14,11 @@ metadata:
   server-version: 0.1.0
 ---
 
-# phone-sms
+# KDE Connect SMS
 
-This skill tells you how to use the four tools of the **phone-sms** MCP server. The server talks
-to the local KDE Connect daemon over D-Bus; the daemon talks to the user's own Android phone over
-Wi-Fi. Texts go out from the user's real number. Nothing is relayed through a cloud service and the
+This skill tells you how to use the four tools of the **kde-connect-sms** MCP server
+(package `phone-sms`). The server talks to the local KDE Connect daemon over D-Bus;
+the daemon talks to the user's own Android phone over Wi-Fi. Texts go out from the user's real number. Nothing is relayed through a cloud service and the
 server itself makes no network calls.
 
 The skill file is MIT. The server is GPL-3.0-or-later and is installed separately from PyPI; it is
