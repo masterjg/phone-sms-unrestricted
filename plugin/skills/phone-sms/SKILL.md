@@ -151,9 +151,5 @@ recipient as `Name Surname <number>` when known, plus the exact text, then call 
 - Sends accepted but nothing arrives: the SMS plugin is disabled for this computer on the phone,
   or Android has not granted KDE Connect the SMS permission. Point the user to the phone's KDE
   Connect settings for this device. Full troubleshooting: https://github.com/h-3303/phone-sms#troubleshooting
-- **Only some threads appear on Android 17**: Android 17 can mark ordinary SMS threads
-  `read_restriction=65536`, and apps with only `READ_SMS` get them filtered out of
-  `content://mms-sms/conversations?simple=true`. Grant KDE Connect the app-op and refresh:
-  `adb shell appops set org.kde.kdeconnect_tp READ_RESTRICTED_MESSAGES allow`. This is a
-  platform regression (Google Issue Tracker 524931678); the default SMS app and `adb shell`
-  still see the missing threads.
+- **Only some threads appear on Android 17**: see the Android 17 read-restriction note in the
+  README troubleshooting section.
