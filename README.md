@@ -146,7 +146,9 @@ The same code paths, for checking things by hand:
 It uses `org.kde.kdeconnect.device.conversations`, the interface the `kdeconnect-sms` app uses.
 The daemon object's introspection XML has duplicate methods, so device discovery is a raw D-Bus
 call. `requestConversation` first emits only cached messages, so `read_thread` waits for `count`
-messages or `conversationLoaded`, not for a quiet gap.
+messages or `conversationLoaded`, not for a quiet gap. `requestAllConversationThreads` pushes
+threads asynchronously, so `list_threads` waits for the thread set to stop changing; the newest
+threads can arrive last after a reconnect.
 
 ## License
 

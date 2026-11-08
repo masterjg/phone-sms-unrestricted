@@ -136,7 +136,8 @@ recipient as `Name Surname <number>` when known, plus the exact text, then call 
 - SMS and the text part of MMS. Attachments are counted, not readable or sendable, in server
   version 0.1.0.
 - The phone must be awake enough for KDE Connect to answer and on the same network as the
-  computer. Thread listings can lag a delivered message by a few minutes.
+  computer. Thread listings can lag a delivered message by a few seconds, especially after a
+  reconnect; the server waits for the list to settle before answering.
 - The server uses the first paired, reachable phone. With several phones, the user sets
   `PHONE_SMS_DEVICE=<id>` (from `kdeconnect-cli -l`) in the server's environment.
 - Group chats are listed with every participant; the user's own number is never shown.
