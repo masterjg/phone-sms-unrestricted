@@ -85,12 +85,39 @@ class Phone:
             raise PhoneError("No paired, reachable KDE Connect device found.")
         return ids[0]
 
-    async def threads(self, refresh_wait: float = 2.0) -> list[Message]:
-        """Latest message of every thread, newest first."""
+    async def threads(
+        self,
+        min_wait: float = 5.0,
+        settle_time: float = 2.0,
+        max_wait: float = 15.0,
+    ) -> list[Message]:
+        """Latest message of every thread, newest first.
+
+        The phone pushes conversations asynchronously after the request. On reconnect it
+        can send over a hundred threads, and the newest ones may arrive several seconds
+        after the older ones, so wait for the list to stop changing instead of reading it
+        after a fixed delay.
+        """
         conv = await self._connect()
         await conv.call_request_all_conversation_threads()
-        await asyncio.sleep(refresh_wait)  # phone pushes updated threads asynchronously
-        msgs = [Message.from_variant(v) for v in await conv.call_active_conversations()]
+        loop = asyncio.get_running_loop()
+        started = loop.time()
+        deadline = started + max_wait
+        previous: tuple[tuple[int, int], ...] | None = None
+        stable_since = started
+        msgs: list[Message] = []
+        while True:
+            msgs = [Message.from_variant(v) for v in await conv.call_active_conversations()]
+            key = tuple(sorted((m.thread_id, m.uid) for m in msgs))
+            now = loop.time()
+            if key != previous:
+                previous = key
+                stable_since = now
+            if now - started >= min_wait and now - stable_since >= settle_time:
+                break
+            if now >= deadline:
+                break
+            await asyncio.sleep(0.25)
         return sorted(msgs, key=lambda m: m.date, reverse=True)
 
     async def conversation(self, thread_id: int, count: int = 20, timeout: float = 10.0) -> list[Message]:
