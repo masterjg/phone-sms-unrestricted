@@ -138,6 +138,12 @@ The same code paths, for checking things by hand:
   `dbus-monitor --session "interface='org.kde.kdeconnect.device.conversations',member='sendWithoutConversation'"`.
 - **Names missing**: enable the Contacts plugin on both ends; vCards land in
   `~/.local/share/kpeoplevcard/kdeconnect-<device>/`.
+- **Only some threads appear on Android 17**: Android 17's RCS read-restriction feature can mark
+  ordinary SMS threads `read_restriction=65536`; apps with only `READ_SMS` then get them filtered
+  out of `content://mms-sms/conversations?simple=true`. Grant the KDE Connect app the app-op:
+  `adb shell appops set org.kde.kdeconnect_tp READ_RESTRICTED_MESSAGES allow`, then refresh.
+  This is a platform bug (Google Issue Tracker 524931678). The default SMS app and `adb shell`
+  are unaffected, so the provider can look complete while KDE Connect sees a subset.
 - The `kdeconnectd` journal line *Unimplemented conversation of type 'r'* comes from the
   notification-forwarding plugin, not SMS.
 
