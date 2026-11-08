@@ -151,5 +151,3 @@ recipient as `Name Surname <number>` when known, plus the exact text, then call 
 - Sends accepted but nothing arrives: the SMS plugin is disabled for this computer on the phone,
   or Android has not granted KDE Connect the SMS permission. Point the user to the phone's KDE
   Connect settings for this device. Full troubleshooting: https://github.com/h-3303/phone-sms#troubleshooting
-- **Only some threads appear on Android 17**: see the Android 17 read-restriction note in the
-  README troubleshooting section.
